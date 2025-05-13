@@ -1,12 +1,73 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
 
-class BackgroundService {
-  Future<void> initializeService(String patientId) async {
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
+
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      return;
+    }
+  }
+
+  if (service is AndroidServiceInstance) {
+    service.setAsForegroundService();
+    service.setForegroundNotificationInfo(
+      title: "Rastreamento ativo",
+      content: "O paciente está sendo monitorado.",
+    );
+  }
+
+  Timer.periodic(const Duration(seconds: 15), (timer) async {
+    if (service is AndroidServiceInstance && !(await service.isForegroundService())) {
+      timer.cancel();
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+
+    final patientCode = "HC20250512192722"; 
+    
+    final _firebaseUrl = [YOUR_FIREBASE_URL];
+
+
+    final response = await http.get(
+      Uri.parse('$firebaseUrl/track_person.json?orderBy="code"&equalTo="$patientCode"'),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data == null || data.isEmpty) return;
+
+      final patientId = data.keys.first;
+
+      final currentLocation = {
+        "currentLocation": {
+          "latitude": position.latitude,
+          "longitude": position.longitude,
+          "address": "Endereço desconhecido",
+          "title": "Localização Atual",
+        }
+      };
+
+      await http.patch(
+        Uri.parse('$firebaseUrl/track_person/$patientId.json'),
+        body: jsonEncode(currentLocation),
+      );
+    }
+  });
+}
+
+Future<void> initializeService() async {
   final service = FlutterBackgroundService();
 
   await service.configure(
@@ -14,47 +75,10 @@ class BackgroundService {
       onStart: onStart,
       isForegroundMode: true,
       autoStart: true,
+      foregroundServiceTypes: [AndroidForegroundType.location],
     ),
-    iosConfiguration: IosConfiguration(
-      onForeground: onStart,
-      onBackground: (_) async => true,
-    ),
+    iosConfiguration: IosConfiguration(),
   );
 
   await service.startService();
-}
-
-@pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
-  const String patientId = "SEU_ID_DO_PACIENTE"; // Troque dinamicamente se quiser
-
-  Timer.periodic(Duration(minutes: 1), (timer) async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) return;
-    }
-
-    final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
-    );
-    
-    await FirebaseFirestore.instance.collection('patients').doc(patientId).update({
-      'currentLocation': {
-        'latitude': position.latitude,
-        'longitude': position.longitude,
-        'timestamp': DateTime.now().toIso8601String(),
-      }
-    });
-  });
-}
-
 }

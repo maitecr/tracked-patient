@@ -18,7 +18,7 @@ class _TrackScreenState extends State<TrackScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _startTrackingLocation();
+    //_startTrackingLocation();
   }
 
   void _getCurrentLocation() async {
@@ -57,7 +57,7 @@ class _TrackScreenState extends State<TrackScreen> {
       //print("Eviando: ${_currentPosition}");
       final trackPacient = Provider.of<TrackPacient>(context, listen: false);
       trackPacient.updateCurrentLocation(
-        "BF20250507215507", _currentPosition);
+        "HC20250512192722", _currentPosition);
     });
   }
 

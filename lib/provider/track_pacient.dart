@@ -7,8 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:tracked_pacient/models/place_location_model.dart';
 
 class TrackPacient with ChangeNotifier {
-  final _firebaseUrl = 'https://track-person-fbb2f-default-rtdb.firebaseio.com';
-  //final _firebaseUrl = [YOUR_FIREBASE_URL];
+  final _firebaseUrl = [YOUR_FIREBASE_URL];
 
   final List<PatientModel> _items = [];
   List<PatientModel> get items => [..._items];
@@ -20,25 +19,17 @@ class TrackPacient with ChangeNotifier {
       Uri.parse('$_firebaseUrl/track_person.json?orderBy="code"&equalTo="$code"'),
       headers: {"Content-Type": "application/json"},
     );
-    print("Response body: ${response.body}");
+    //print("Response body: ${response.body}");
 
-    print(response.statusCode);
+    //print(response.statusCode);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data);
+      //print(data);
 
       if (data == null || data.isEmpty) return;
 
       final patientId = data.keys.first;
-      print("patient id ${patientId}");
-
-      if (!data[patientId].containsKey('currentLocation')) {
-        await http.put(
-          Uri.parse('$_firebaseUrl/track_person/$patientId/currentLocation.json'),
-          body: jsonEncode(null),
-        );
-      }
-
+      //print("patient id ${patientId}");
 
       final updatedLocation = PlaceLocationModel(
         latitude: position.latitude,
@@ -59,3 +50,13 @@ class TrackPacient with ChangeNotifier {
 
   }
 }
+
+// {
+//   "rules": {
+//     ".read": "now < 1749610800000",  // 2025-6-11
+//     ".write": "now < 1749610800000",  // 2025-6-11
+//     "track_person": {
+//       ".indexOn": ["code"]
+//     }
+//   }
+// }
