@@ -34,8 +34,7 @@ void onStart(ServiceInstance service) async {
 
     Position position = await Geolocator.getCurrentPosition();
 
-    final patientCode = "HC20250512192722"; 
-    
+    final patientCode = "TCDR20250515144851"; 
     final _firebaseUrl = [YOUR_FIREBASE_URL];
 
 
@@ -44,8 +43,11 @@ void onStart(ServiceInstance service) async {
       headers: {"Content-Type": "application/json"},
     );
 
+    print("Response body: ${response.body}");
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data);
       if (data == null || data.isEmpty) return;
 
       final patientId = data.keys.first;
@@ -68,6 +70,8 @@ void onStart(ServiceInstance service) async {
 }
 
 Future<void> initializeService() async {
+  await Geolocator.requestPermission();
+
   final service = FlutterBackgroundService();
 
   await service.configure(

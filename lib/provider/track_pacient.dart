@@ -7,7 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:tracked_pacient/models/place_location_model.dart';
 
 class TrackPacient with ChangeNotifier {
-  final _firebaseUrl = [YOUR_FIREBASE_URL];
+  final _firebaseUrl = 'https://track-patient-cb919-default-rtdb.firebaseio.com';
+  //final _firebaseUrl = [YOUR_FIREBASE_URL];
 
   final List<PatientModel> _items = [];
   List<PatientModel> get items => [..._items];
