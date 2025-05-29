@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracked_pacient/provider/track_pacient.dart';
-import 'package:provider/provider.dart';
-import 'package:tracked_pacient/screens/track_screen.dart';
+import 'package:tracked_pacient/screens/loadingScreen.dart';
 import 'package:tracked_pacient/services/background_service.dart';
 
 void main() async {
@@ -9,10 +7,7 @@ void main() async {
 
   await initializeService();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => TrackPacient(),
-      child: const MyApp(),
-    ),
+      const MyApp(),
   );
 }
 
@@ -26,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: TrackScreen(),
+      home: Loadingscreen(),
     );
   }
 }
