@@ -34,7 +34,7 @@ void onStart(ServiceInstance service) async {
 
     Position position = await Geolocator.getCurrentPosition();
 
-    final patientCode = "TCDR20250515144851"; 
+    final patientCode = "RPA20250610173946"; 
     final _firebaseUrl = [YOUR_FIREBASE_URL];
 
 
@@ -43,7 +43,7 @@ void onStart(ServiceInstance service) async {
       headers: {"Content-Type": "application/json"},
     );
 
-    print("Response body: ${response.body}");
+    //print("Response body: ${response.body}");
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -60,6 +60,8 @@ void onStart(ServiceInstance service) async {
           "title": "Localização Atual",
         }
       };
+
+      print("Localização em tempo real: {$currentLocation}");
 
       await http.patch(
         Uri.parse('$firebaseUrl/track_person/$patientId.json'),
