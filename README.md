@@ -1,16 +1,15 @@
-# tracked_pacient
+# Tracked Paciente
 
-A new Flutter project.
+Projeto desenvolvido como atividade avaliativa no curso de Análise e Desenvolvimento de sistemas. Consiste em um aplicativo mobile para envio de rastreio em tempo, permitindo sua execução em segundo plano.
 
-## Getting Started
+A aplicação envia o posicionamento geografico para o Firebase para que o dispositivo possa ser monitorado em tempo real pela aplicação "Track", disponível [neste repositório](https://github.com/maitecr/track-person)
+
+## Como executar
 
 This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* Alterar URL do firebase no caminho:
+```
+lib\services\background_service.dart
+```
+* Instalar dependências: `flutter pub get`
+* Executar código: `flutter run`
